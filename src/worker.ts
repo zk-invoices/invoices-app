@@ -6,18 +6,18 @@ const minaUrl = import.meta.env.VITE_ZK_MINA_GRAPH;
 const archiveUrl = import.meta.env.VITE_ZK_MINA_ARCHIVE;
 
 async function fetchFiles(type: string) {
-  const { files } = await fetch(
-    `${import.meta.env.VITE_API_BASE_URL}/cache/discovery/${type}`
+  const files = await fetch(
+    `${import.meta.env.VITE_ZK_APPS_CACHE_BASE_URL}/${type}/directory.json`
   ).then((res) => res.json());
 
   return Promise.all(
     files.map((file: Record<string, string>) => {
       return Promise.all([
         fetch(
-          `${import.meta.env.VITE_API_BASE_URL}/cache/${type}/${file.name}.header`
+          `${import.meta.env.VITE_ZK_APPS_CACHE_BASE_URL}/${type}/${file.name}.header`
         ).then((res) => res.text()),
         fetch(
-          `${import.meta.env.VITE_API_BASE_URL}/cache/${type}/${file.name}`
+          `${import.meta.env.VITE_ZK_APPS_CACHE_BASE_URL}/${type}/${file.name}`
         ).then((res) => res.text()),
       ]).then(([header, data]) => ({ file, header, data }));
     })
@@ -102,7 +102,7 @@ async function main() {
         return compiled;
       }
 
-      const invoicesCacheFiles = fetchFiles('invoices');
+      const invoicesCacheFiles = fetchFiles(import.meta.env.VITE_ZK_APPS_CACHE_INVOICES);
 
       console.log('compile zkapp');
       compiled = Invoices.compile({
@@ -158,7 +158,7 @@ async function main() {
   });
 
   postStatusUpdate({ message: 'Loading cached zkApp files' });
-  const providerCacheFiles = await fetchFiles('provider');
+  const providerCacheFiles = await fetchFiles(import.meta.env.VITE_ZK_APPS_CACHE_INVOICES);
   const cache = (files: any[]) => {
     return FileSystem(files, ({ type, persistentId }: any) => {
       if (type === 'hit') {
