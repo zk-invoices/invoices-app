@@ -1,73 +1,9 @@
 import { PublicKey, UInt32 } from 'o1js';
-import type { MinaCache } from './cache';
+import AsyncMinaCache from './cache';
 import { Timestamp } from 'firebase/firestore';
 
 const minaUrl = import.meta.env.VITE_ZK_MINA_GRAPH;
 const archiveUrl = import.meta.env.VITE_ZK_MINA_ARCHIVE;
-
-async function fetchFiles(type: string) {
-  const files = await fetch(
-    `${import.meta.env.VITE_ZK_APPS_CACHE_BASE_URL}/${type}/directory.json`
-  ).then((res) => res.json());
-
-  return Promise.all(
-    files.map((file: Record<string, string>) => {
-      return Promise.all([
-        fetch(
-          `${import.meta.env.VITE_ZK_APPS_CACHE_BASE_URL}/${type}/${file.name}.header`
-        ).then((res) => res.text()),
-        fetch(
-          `${import.meta.env.VITE_ZK_APPS_CACHE_BASE_URL}/${type}/${file.name}`
-        ).then((res) => res.text()),
-      ]).then(([header, data]) => ({ file, header, data }));
-    })
-  ).then((cacheList) =>
-    cacheList.reduce((acc: any, { file, header, data }) => {
-      acc[file.name] = { file, header, data };
-
-      return acc;
-    }, {})
-  );
-}
-
-const FileSystem = (files: any, onAccess: any): MinaCache => ({
-  read({ persistentId, uniqueId, dataType }: any) {
-    if (!files[persistentId]) {
-      console.log('read');
-      console.log({ persistentId, uniqueId, dataType });
-
-      return undefined;
-    }
-
-    const currentId = files[persistentId].header;
-
-    if (currentId !== uniqueId) {
-      console.log('current id did not match persistent id');
-
-      return undefined;
-    }
-
-    if (dataType === 'string') {
-      onAccess({ type: 'hit', persistentId, uniqueId, dataType });
-
-      return new TextEncoder().encode(files[persistentId].data);
-    }
-    // Due to the large size of prover keys, they will be compiled on the users machine.
-    // This allows for a non blocking UX implementation.
-    // else {
-    //   let buffer = readFileSync(resolve(cacheDirectory, persistentId));
-    //   return new Uint8Array(buffer.buffer);
-    // }
-    onAccess({ type: 'miss', persistentId, uniqueId, dataType });
-
-    return undefined;
-  },
-  write({ persistentId, uniqueId, dataType }: any) {
-    console.log('write');
-    console.log({ persistentId, uniqueId, dataType });
-  },
-  canWrite: true,
-});
 
 async function main() {
   const { AccountUpdate, Bool, Field, MerkleTree, Mina, fetchAccount } =
@@ -102,11 +38,25 @@ async function main() {
         return compiled;
       }
 
-      const invoicesCacheFiles = fetchFiles(import.meta.env.VITE_ZK_APPS_CACHE_INVOICES);
+      const invoicesCache = AsyncMinaCache(
+        `${import.meta.env.VITE_ZK_APPS_CACHE_BASE_URL}/${import.meta.env.VITE_ZK_APPS_CACHE_INVOICES}`,
+        ({ type, persistentId }: any) => {
+          if (type === 'hit') {
+            postStatusUpdate({
+              message: `Found ${persistentId} in pre-built binaries`,
+            });
+          }
+    
+          if (type === 'miss') {
+            postStatusUpdate({ message: `Compiling ${persistentId}` });
+          }
+        }  
+      );
 
       console.log('compile zkapp');
+      await invoicesCache.fetch();
       compiled = Invoices.compile({
-        cache: cache(await invoicesCacheFiles),
+        cache: invoicesCache.cache(),
       });
 
       compiled.then(() => {
@@ -158,9 +108,9 @@ async function main() {
   });
 
   postStatusUpdate({ message: 'Loading cached zkApp files' });
-  const providerCacheFiles = await fetchFiles(import.meta.env.VITE_ZK_APPS_CACHE_INVOICES);
-  const cache = (files: any[]) => {
-    return FileSystem(files, ({ type, persistentId }: any) => {
+  const providerCache = AsyncMinaCache(
+    `${import.meta.env.VITE_ZK_APPS_CACHE_BASE_URL}/${import.meta.env.VITE_ZK_APPS_CACHE_PROVIDER}`,
+    ({ type, persistentId }: any) => {
       if (type === 'hit') {
         postStatusUpdate({
           message: `Found ${persistentId} in pre-built binaries`,
@@ -170,12 +120,14 @@ async function main() {
       if (type === 'miss') {
         postStatusUpdate({ message: `Compiling ${persistentId}` });
       }
-    });
-  };
+    }  
+  );
+
 
   postStatusUpdate({ message: 'Initiated zkApp compilation process' });
 
-  await InvoicesProvider.compile({ cache: cache(providerCacheFiles) });
+  await providerCache.fetch();
+  await InvoicesProvider.compile({ cache: providerCache.cache() });
 
   postMessage({
     type: 'zkapp',
@@ -210,7 +162,6 @@ async function main() {
     await fetchAccount({
       publicKey: senderAddress,
     });
-
 
     postStatusUpdate({ message: 'Crafting transaction' });
     const fee = Number(0.1) * 1e9;

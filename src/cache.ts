@@ -59,3 +59,78 @@ export type MinaCache = {
    */
   canWrite: boolean;
 };
+
+async function fetchFiles(baseUrl: string) {
+  const files = await fetch(
+    `${baseUrl}/directory.json`
+  ).then((res) => res.json());
+
+  return Promise.all(
+    files.map((file: Record<string, string>) => {
+      return Promise.all([
+        fetch(
+          `${baseUrl}/${file.name}.header`
+        ).then((res) => res.text()),
+        fetch(
+          `${baseUrl}/${file.name}`
+        ).then((res) => res.text()),
+      ]).then(([header, data]) => ({ file, header, data }));
+    })
+  ).then((cacheList) =>
+    cacheList.reduce((acc: any, { file, header, data }) => {
+      acc[file.name] = { file, header, data };
+
+      return acc;
+    }, {})
+  );
+}
+
+const FileSystem = (files: any, onAccess?: any): MinaCache => ({
+  read({ persistentId, uniqueId, dataType }: any) {
+    if (!files[persistentId]) {
+      console.log('read');
+      console.log({ persistentId, uniqueId, dataType });
+
+      return undefined;
+    }
+
+    const currentId = files[persistentId].header;
+
+    if (currentId !== uniqueId) {
+      console.log('current id did not match persistent id');
+
+      return undefined;
+    }
+
+    if (dataType === 'string') {
+      onAccess({ type: 'hit', persistentId, uniqueId, dataType });
+
+      return new TextEncoder().encode(files[persistentId].data);
+    }
+    // Due to the large size of prover keys, they will be compiled on the users machine.
+    // This allows for a non blocking UX implementation.
+    // else {
+    //   let buffer = readFileSync(resolve(cacheDirectory, persistentId));
+    //   return new Uint8Array(buffer.buffer);
+    // }
+    onAccess({ type: 'miss', persistentId, uniqueId, dataType });
+
+    return undefined;
+  },
+  write({ persistentId, uniqueId, dataType }: any) {
+    console.log('write');
+    console.log({ persistentId, uniqueId, dataType });
+  },
+  canWrite: true,
+});
+
+export default function AsyncMinaCache(cacheBaseUrl: string, onHitOrMiss: ({ type, persistentId }: any) => void) {
+  let files: string[] = [];
+
+  return {
+    fetch: async () => {
+      files = await fetchFiles(cacheBaseUrl)
+    },
+    cache: () => FileSystem(files, onHitOrMiss)
+  }
+}
