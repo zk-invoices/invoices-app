@@ -13,7 +13,7 @@ import Layout from './pages/Layout';
 import UserContext from './context/UserContext';
 import Invoices from './pages/Invoices';
 import Products from './pages/Products';
-import Login from './pages/login';
+import Login from './pages/LoginPage';
 
 import { Loader } from './components/Loader';
 import SendInvoice from './pages/NewInvoice';
