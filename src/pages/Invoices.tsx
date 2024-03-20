@@ -19,10 +19,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
-import { useModal } from '@ebay/nice-modal-react';
 
-import { RawInvoice, createInvoice } from '../services/InvoiceService';
-import { useOutletContext } from 'react-router-dom';
+import { RawInvoice } from '../services/InvoiceService';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import { formatDistance } from 'date-fns';
 
 function SentInvoiceCard({
@@ -65,7 +64,7 @@ function SentInvoiceCard({
 
 export default function Invoices() {
   const outlet: any = useOutletContext();
-  const createInvoiceModal = useModal('create-invoice-modal');
+  const navigate = useNavigate();
   const [sentInvoices, setSentInvoices] = useState<any[]>([]);
   const [receivedInvoices, setReceivedInvoices] = useState<any[]>([]);
   const { user } = useContext(UserContext);
@@ -106,11 +105,11 @@ export default function Invoices() {
     );
   }, []);
 
-  async function initNewInvoice() {
-    const { invoice }: any = await createInvoiceModal.show({ from: user?.uid });
+  // async function initNewInvoice() {
+  //   const { invoice }: any = await createInvoiceModal.show({ from: user?.uid });
 
-    createInvoice(invoice);
-  }
+  //   createInvoice(invoice);
+  // }
 
   async function mintInvoice(id: string, from: string, to: string, amount: number, dueDate: Date) {
     outlet.createInvoice(id, from, to, amount, dueDate);
@@ -131,13 +130,13 @@ export default function Invoices() {
                 <p className="block">
                   You have not yet experienced the new age of provable invoices.
                 </p>
-                <Button variant="outline" onClick={initNewInvoice}>
+                <Button variant="outline" onClick={() => navigate('/invoices/new')}>
                   Send New Invoice
                 </Button>
               </AlertDescription>
             </Alert>
           ) : (
-            <Button className="w-full" onClick={initNewInvoice}>
+            <Button className="w-full" onClick={() => navigate('/invoices/new')}>
               Send New Invoice
             </Button>
           )}

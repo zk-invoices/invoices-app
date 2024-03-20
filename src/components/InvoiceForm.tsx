@@ -36,7 +36,7 @@ export default function InvoiceForm({
     <div className="space-y-4">
       <div className="space-y-4 text-left grid grid-cols-2 gap-4">
         <div className='col-span-2'>
-          <label className="text-sm">To</label>
+          <label className="text-sm">Buyer</label>
           <input
             id="invoice-to"
             name="to"
