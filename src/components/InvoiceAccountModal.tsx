@@ -2,7 +2,7 @@ import { Fragment, useEffect, useState } from 'react';
 import { Transition, Dialog } from '@headlessui/react';
 import NiceModal, { useModal } from '@ebay/nice-modal-react';
 import { Field, PublicKey, fetchAccount } from 'o1js';
-import { ShortAddress } from '../utils/common';
+import { getShortAddress } from '../utils/common';
 import { Loader } from './Loader';
 
 async function fetchInvoicesAccount(address: string) {
@@ -80,7 +80,7 @@ const InvoiceAccountModal = NiceModal.create(() => {
                     <div>
                       App Hash:{' '}
                       {zkAppHash && (
-                        <ShortAddress address={zkAppHash} length={5} />
+                        <p>{ getShortAddress(zkAppHash, 5) }</p>
                       )}{' '}
                     </div>
                   </div>

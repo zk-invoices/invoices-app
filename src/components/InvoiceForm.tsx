@@ -41,8 +41,8 @@ export default function InvoiceForm({
             id="invoice-to"
             name="to"
             className="w-full border bg-gray-50 rounded-md p-2"
-            value={invoice.to}
-            onChange={(e) => handleChange('to', e.target.value)}
+            value={invoice.buyer}
+            onChange={(e) => handleChange('buyer', e.target.value)}
           />
         </div>
         <div>

@@ -12,7 +12,7 @@ import {
 
 import { User } from 'firebase/auth';
 import UserContext from '../context/UserContext';
-import { ShortAddress } from '../utils/common';
+import { getShortAddress } from '../utils/common';
 
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -36,8 +36,9 @@ function SentInvoiceCard({
       <CardContent className="pt-4">
         <div className="flex flex-row items-center">
           <div className="grow">
-            <small className="text-gray-400">Sent to</small>
-            <ShortAddress address={invoice.to} length={10} />
+            <small className="text-gray-400">Sent to</small>   
+            <p>{getShortAddress(invoice.buyer, 10)}</p>
+            <small className='block'>({invoice.metadata.buyerEmail})</small>
 
             <small className="text-gray-400">Due Date</small>
             <p>{formatDistance(invoice.dueDate.toDate(), new Date(), { addSuffix: true })}</p>
@@ -82,7 +83,7 @@ export default function Invoices() {
     onSnapshot(
       query(
         collection(db, 'invoices'),
-        or(where('from', '==', userId), where('to', '==', userId)),
+        or(where('buyer', '==', userId), where('seller', '==', userId)),
         orderBy('createdAt', 'desc')
       ),
       (snap) => {
@@ -91,7 +92,7 @@ export default function Invoices() {
         const received: RawInvoice[] = [];
 
         invoices.forEach((invoice) => {
-          if (invoice.to === userId) {
+          if (invoice.buyer === userId) {
             received.push(invoice);
             return;
           }
@@ -167,7 +168,7 @@ export default function Invoices() {
               <div className="flex flex-row">
                 <div className="grow">
                   <small className="text-gray-400 mt-4">From</small>
-                  <ShortAddress address={invoice.from} length={5} />
+                  <p>{getShortAddress(invoice.seller)}</p>
                   <small className="text-gray-400">Due Date</small>
                   <p>{formatDistance(invoice.dueDate.toDate(), new Date(), { addSuffix: true })}</p>
                 </div>
