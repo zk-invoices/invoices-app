@@ -1,25 +1,27 @@
 import { Fragment } from 'react';
 import { Transition, Dialog } from '@headlessui/react';
 import NiceModal, { useModal } from '@ebay/nice-modal-react';
-import InvoiceForm from './InvoiceForm';
-import { useRandomInvoice } from '../utils/useRandomInvoice';
-import { Button } from '@/components/ui/button';
-import { RotateCcw } from 'lucide-react';
 
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from '@/components/ui/hover-card';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
 
-import { RawInvoice } from '../services/InvoiceService';
+const products = [
+  {
+    id: 1,
+    name: 'Product #1',
+    price: 10
+  },
+  {
+    id: 2,
+    name: 'Product #2',
+    price: 20,
+  }
+];
 
-const InvoiceModal = NiceModal.create(() => {
+const ProductSearchModal = NiceModal.create(() => {
   const modal = useModal();
-  const { invoice, regenerate } = useRandomInvoice(modal.args?.from as string);
 
-  function handleCreate(invoice: unknown) {
-    modal.resolve({ invoice });
+  function handleSelect(product: unknown) {
+    modal.resolve(product);
     modal.remove();
   }
 
@@ -55,31 +57,23 @@ const InvoiceModal = NiceModal.create(() => {
                     as="h2"
                     className="text-2xl font-medium text-gray-900"
                   >
-                    Send Invoice
+                    Products
                   </Dialog.Title>
-                  <HoverCard>
-                    <HoverCardTrigger>
-                      <Button
-                        variant="outline"
-                        className="float-right"
-                        onClick={regenerate}
-                      >
-                        <RotateCcw />
-                      </Button>
-                    </HoverCardTrigger>
-                    <HoverCardContent align='end' className="text-sm">
-                    For the purpose this demo, these values are randomly generated. Use this option to regenerate values.
-                    </HoverCardContent>
-                  </HoverCard>
                 </div>
                 <Dialog.Description
                   as="p"
                   className="text-center px-8 mt-4 text-gray-400"
                 ></Dialog.Description>
-                <InvoiceForm
-                  create={handleCreate}
-                  initialValue={invoice as RawInvoice}
-                />
+                { products.map((p) => {
+                  return <Card key={p.id} onClick={() => handleSelect(p)} className='hover:shadow-lg pointer'>
+                    <CardContent className="pt-4">
+                      <p className="text-lg">{p.name}</p>
+                    </CardContent>
+                    <CardFooter >
+                    <p className="text-base">Price: {p.price}</p>
+                    </CardFooter>
+                  </Card>
+                }) }
               </Dialog.Panel>
             </Transition.Child>
           </div>
@@ -89,4 +83,4 @@ const InvoiceModal = NiceModal.create(() => {
   );
 });
 
-export default InvoiceModal;
+export default ProductSearchModal;

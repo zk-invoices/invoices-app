@@ -5,7 +5,7 @@ import { Toaster } from 'react-hot-toast';
 import { UserProvider } from './context/UserContext';
 import Router from './Router';
 
-import InvoiceModal from './components/NewInvoiceModal';
+import ProductSearchModal from './components/ProductSearchModal';
 import InvoiceAccountModal from './components/InvoiceAccountModal';
 import TransactionsDrawer from './components/TransactionsDrawer';
 
@@ -21,7 +21,7 @@ const firebaseConfig = {
 // Initialize Firebase
 initializeApp(firebaseConfig);
 
-NiceModal.register('create-invoice-modal', InvoiceModal);
+NiceModal.register('product-search-modal', ProductSearchModal);
 NiceModal.register('invoice-account-modal', InvoiceAccountModal);
 NiceModal.register('transaction-drawer', TransactionsDrawer);
 
