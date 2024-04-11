@@ -204,11 +204,14 @@ async function main() {
     const invoice = new Invoice({
       id: Field.from(id),
       dueDate: dueDate,
-      from,
-      to,
+      seller: from,
+      buyer: to,
       amount,
       metadataHash: Field(0),
       settled: Bool(false),
+      createdAt: dueDate,
+      updatedAt: dueDate,
+      itemsRoot: Field(0)
     });
 
     postStatusUpdate({ message: 'Crafting transaction' });
