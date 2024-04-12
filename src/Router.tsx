@@ -9,6 +9,7 @@ import {
 } from 'react-router-dom';
 
 import Layout from './pages/Layout';
+import NewLayout from './pages/NewLayout';
 
 import UserContext from './context/UserContext';
 import Invoices from './pages/Invoices';
@@ -30,11 +31,37 @@ function ProtectedRoute({ children }: any) {
 
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route path="/" element={<Layout />}>
-      <Route path="/" element={<ProtectedRoute><Invoices /></ProtectedRoute>} />
-      <Route path="/products" element={<ProtectedRoute><Products /></ProtectedRoute>} />
-      <Route path="/invoices/new" element={<ProtectedRoute><SendInvoice /></ProtectedRoute>} />
+    <Route path="/">
       <Route path="/login" element={<Login />} />
+      <Route path="/_" element={<NewLayout />}>
+      </Route>
+      <Route path="/" element={<Layout />}>
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Invoices />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/products"
+          element={
+            <ProtectedRoute>
+              <Products />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/invoices/new"
+          element={
+            <ProtectedRoute>
+              <SendInvoice />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/login" element={<Login />} />
+      </Route>
     </Route>
   )
 );
