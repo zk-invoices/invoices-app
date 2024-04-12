@@ -1,7 +1,6 @@
 import UserContext from '../context/UserContext';
 import {
   getAuth,
-  signInAnonymously,
   signInWithCustomToken,
   signInWithRedirect,
 } from 'firebase/auth';
@@ -21,7 +20,7 @@ function LoginWithMina() {
         message: 'login to invoices',
       });
 
-      const data = await fetch('http://localhost:3000/login', {
+      const data = await fetch(`${import.meta.env.VITE_API_BASE_URL}/login`, {
         method: 'POST',
         body: JSON.stringify(sign),
         headers: {
@@ -53,21 +52,11 @@ export default function Login() {
     signInWithRedirect(auth, provider);
   }
 
-  function anonymousLogin() {
-    const auth = getAuth();
-
-    signInAnonymously(auth).then(() => {
-      window.location.pathname = '/';
-    });
-  }
-
   if (loading) {
     return <Loader />;
   }
 
   if (user) {
-    console.log('user', user);
-
     window.location.pathname = '/';
 
     return <>Hi</>;
@@ -78,9 +67,6 @@ export default function Login() {
       <LoginWithMina />
       <Button variant="secondary" onClick={authenticate}>
         Login with google
-      </Button>
-      <Button variant="secondary" onClick={anonymousLogin}>
-        Anonymous Login
       </Button>
     </div>
   );
