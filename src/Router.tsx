@@ -16,14 +16,16 @@ import Invoices from './pages/Invoices';
 import Products from './pages/Products';
 import Login from './pages/LoginPage';
 
+import HomePage from './pages/HomePage';
+
 import { Loader } from './components/Loader';
 import SendInvoice from './pages/NewInvoice';
 
 function ProtectedRoute({ children }: any) {
   const { user } = useContext(UserContext);
 
-  if (!user ) {
-    return window.location.href = '/login';
+  if (!user) {
+    return (window.location.href = '/login');
   }
 
   return children;
@@ -34,6 +36,14 @@ const router = createBrowserRouter(
     <Route path="/">
       <Route path="/login" element={<Login />} />
       <Route path="/_" element={<NewLayout />}>
+        <Route
+          path="/_"
+          element={
+            <ProtectedRoute>
+              <HomePage />
+            </ProtectedRoute>
+          }
+        />
       </Route>
       <Route path="/" element={<Layout />}>
         <Route
