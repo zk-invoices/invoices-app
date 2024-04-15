@@ -17,6 +17,7 @@ import Products from './pages/Products';
 import Login from './pages/LoginPage';
 
 import NewSendInvoice from './pages/CreateInvoicePage';
+import ClientsPage from './pages/ClientsPage';
 
 import HomePage from './pages/HomePage';
 
@@ -51,6 +52,14 @@ const router = createBrowserRouter(
           element={
             <ProtectedRoute>
               <NewSendInvoice />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/_/clients"
+          element={
+            <ProtectedRoute>
+              <ClientsPage />
             </ProtectedRoute>
           }
         />
