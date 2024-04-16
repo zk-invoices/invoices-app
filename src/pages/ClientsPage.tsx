@@ -10,6 +10,7 @@ import {
 import { AvatarImage, AvatarFallback, Avatar } from '@/components/ui/avatar';
 
 import { useEffect, useState } from 'react';
+import { useModal } from '@ebay/nice-modal-react';
 
 import { collection, getDocs, getFirestore } from 'firebase/firestore';
 
@@ -24,6 +25,8 @@ export type Client = {
 };
 
 export default function Component() {
+  const modal = useModal('add-new-client-modal');
+
   const [loading, setLoading] = useState(true);
   const [clients, setClients] = useState<Client[]>([]);
 
@@ -43,6 +46,10 @@ export default function Component() {
     fetchClients();
   }, []);
 
+  function openNewClientModal() {
+    modal.show();
+  }
+
   if (loading) {
     return <p>Loading</p>;
   }
@@ -52,6 +59,9 @@ export default function Component() {
       <div>
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-2xl font-bold tracking-tight">Clients</h1>
+          <Button size="sm" onClick={openNewClientModal}>
+            Add Client
+          </Button>
         </div>
         <div className="border shadow-sm rounded-lg">
           <Table>
