@@ -1,4 +1,3 @@
-
 import { useContext } from 'react';
 
 import {
@@ -18,6 +17,7 @@ import Login from './pages/LoginPage';
 
 import NewSendInvoice from './pages/CreateInvoicePage';
 import ClientsPage from './pages/ClientsPage';
+import ProductsPage from './pages/ProductsPage';
 
 import HomePage from './pages/HomePage';
 
@@ -60,6 +60,14 @@ const router = createBrowserRouter(
           element={
             <ProtectedRoute>
               <ClientsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/_/products"
+          element={
+            <ProtectedRoute>
+              <ProductsPage />
             </ProtectedRoute>
           }
         />
