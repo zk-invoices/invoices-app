@@ -9,6 +9,7 @@ import ProductSearchModal from './components/ProductSearchModal';
 import InvoiceAccountModal from './components/InvoiceAccountModal';
 import TransactionsDrawer from './components/TransactionsDrawer';
 import CreateClientModal from './components/CreateClientModal';
+import CreateNewProductModal from './components/CreateNewProduct';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FB_API_KEY,
@@ -26,6 +27,7 @@ NiceModal.register('product-search-modal', ProductSearchModal);
 NiceModal.register('invoice-account-modal', InvoiceAccountModal);
 NiceModal.register('transaction-drawer', TransactionsDrawer);
 NiceModal.register('add-new-client-modal', CreateClientModal);
+NiceModal.register('add-new-product-modal', CreateNewProductModal);
 
 export default function AppContainer() {
   return (

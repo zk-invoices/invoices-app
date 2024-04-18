@@ -1,3 +1,4 @@
+import { useModal } from '@ebay/nice-modal-react';
 import {
   Table,
   TableBody,
@@ -20,6 +21,8 @@ type Product = {
 };
 
 export default function ProductsPage() {
+  const newProductModal = useModal('add-new-product-modal');
+
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -40,6 +43,21 @@ export default function ProductsPage() {
     fetchProducts();
   }, []);
 
+  const openAddNewProductModal = async () => {
+    const newProductData = await newProductModal.show();
+
+    if (newProductData) {
+      const docRef = await addDoc(
+        collection(getFirestore(), 'products'),
+        newProductData
+      );
+      setProducts([
+        ...products,
+        { ...newProductData, id: docRef.id } as Product,
+      ]);
+    }
+  };
+
   if (loading) {
     return <p>Loading</p>;
   }
@@ -49,6 +67,9 @@ export default function ProductsPage() {
       <div>
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-2xl font-bold tracking-tight">Products</h1>
+          <Button size="sm" onClick={openAddNewProductModal}>
+            Add Product
+          </Button>
         </div>
         <div className="border shadow-sm rounded-lg">
           <Table>
