@@ -13,9 +13,7 @@ async function main() {
     import.meta.env.VITE_ZK_APP_ADDRESS
   );
 
-  const { Invoices, InvoicesProvider } = await import(
-    'invoices/build/src'
-  );
+  const { Invoices, InvoicesProvider } = await import('invoices/build/src');
 
   const { Invoice, InvoicesWitness } = await import(
     'invoices/src/InvoicesModels'
@@ -46,11 +44,11 @@ async function main() {
               message: `Found ${persistentId} in pre-built binaries`,
             });
           }
-    
+
           if (type === 'miss') {
             postStatusUpdate({ message: `Compiling ${persistentId}` });
           }
-        }  
+        }
       );
 
       console.log('compile zkapp');
@@ -60,7 +58,7 @@ async function main() {
       });
 
       compiled.then(() => {
-        console.log('compile zkapp: done')
+        console.log('compile zkapp: done');
       });
 
       return compiled;
@@ -77,8 +75,13 @@ async function main() {
       const to = PublicKey.fromBase58(data.to);
       const amount = UInt32.from(data.amount);
       const id = data.id;
-      const dueDateTimestamp = new Timestamp(data.dueDate.seconds, data.dueDate.nanoseconds);
-      const dueDate = UInt32.from(Math.floor(dueDateTimestamp.toDate().valueOf() / 1000));
+      const dueDateTimestamp = new Timestamp(
+        data.dueDate.seconds,
+        data.dueDate.nanoseconds
+      );
+      const dueDate = UInt32.from(
+        Math.floor(dueDateTimestamp.toDate().valueOf() / 1000)
+      );
 
       console.log(Math.floor(dueDateTimestamp.toDate().valueOf() / 1000));
 
@@ -120,9 +123,8 @@ async function main() {
       if (type === 'miss') {
         postStatusUpdate({ message: `Compiling ${persistentId}` });
       }
-    }  
+    }
   );
-
 
   postStatusUpdate({ message: 'Initiated zkApp compilation process' });
 
@@ -170,7 +172,11 @@ async function main() {
     await fetchAccount({ publicKey: zkAppAddress });
     const tx = await Mina.transaction({ sender: senderAddress, fee }, () => {
       AccountUpdate.fundNewAccount(senderAddress);
-      zkApp.mint(senderAddress, invoicesVkGenerated.verificationKey, tree.getRoot());
+      zkApp.mint(
+        senderAddress,
+        invoicesVkGenerated.verificationKey,
+        tree.getRoot()
+      );
     });
 
     postStatusUpdate({ message: 'Creating transaction proof' });
@@ -211,7 +217,7 @@ async function main() {
       settled: Bool(false),
       createdAt: dueDate,
       updatedAt: dueDate,
-      itemsRoot: Field(0)
+      itemsRoot: Field(0),
     });
 
     postStatusUpdate({ message: 'Crafting transaction' });
@@ -266,16 +272,16 @@ async function main() {
   }
 
   async function commit(from: PublicKey) {
-    console.log('commit: compile invoices zkapp')
+    console.log('commit: compile invoices zkapp');
     await compileInvoices();
-    console.log('commit: compiled zkapp')
+    console.log('commit: compiled zkapp');
 
     postStatusUpdate({ message: 'Crafting transaction' });
     const fee = Number(0.1) * 1e9;
 
     const userInvoicesApp = new Invoices(from, zkApp.token.id);
     await fetchAccount({ publicKey: zkAppAddress }, minaUrl);
-    await fetchAccount({ publicKey: from }, minaUrl );
+    await fetchAccount({ publicKey: from }, minaUrl);
     await fetchAccount(
       {
         publicKey: from,

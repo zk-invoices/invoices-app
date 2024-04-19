@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router-dom';
 
-import MyWorker from '../worker?worker';
+// import MyWorker from '../worker?worker';
 import { useContext, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import UserContext from '../context/UserContext';
@@ -11,7 +11,7 @@ import { LogOutIcon, User2Icon, ListChecksIcon } from 'lucide-react';
 import InvoicesMinaApp from '../components/InvoicesMinaApp';
 import { useModal } from '@ebay/nice-modal-react';
 
-const worker = new MyWorker();
+// const worker = new MyWorker();
 
 function Header({ user }: { user: null | User }) {
   const userAccountModal = useModal('invoice-account-modal');
@@ -63,36 +63,30 @@ export default function Layout() {
   const [compiled, setCompiled] = useState(false);
 
   useEffect(() => {
-    worker.onmessage = (event: any) => {
-      const { type, action } = event.data || {};
-
-      if (type === 'response' && action === 'transaction') {
-        const existingTxns = localStorage.getItem('totalTxns'),
-          txnKey = existingTxns ? `txn[${existingTxns}]` : `txn[0]`;
-
-        localStorage.setItem(txnKey, JSON.stringify(event.data.data));
-        localStorage.setItem(
-          'totalTxns',
-          `${(existingTxns ? Number(existingTxns) : 0) + 1}`
-        );
-
-        sendTransaction(event.data.data.txn).then(({ hash }) => {
-          localStorage.setItem(`${txnKey}[hash]`, hash);
-        });
-
-        return;
-      }
-
-      if (compiled) {
-        return;
-      }
-
-      if (type === 'zkapp' && action === 'compiled') {
-        setCompiled(true);
-      } else if (type === 'update') {
-        toast.loading(event.data.data, { id: 'zkapp-loader-toast' });
-      }
-    };
+    // worker.onmessage = (event: any) => {
+    //   const { type, action } = event.data || {};
+    //   if (type === 'response' && action === 'transaction') {
+    //     const existingTxns = localStorage.getItem('totalTxns'),
+    //       txnKey = existingTxns ? `txn[${existingTxns}]` : `txn[0]`;
+    //     localStorage.setItem(txnKey, JSON.stringify(event.data.data));
+    //     localStorage.setItem(
+    //       'totalTxns',
+    //       `${(existingTxns ? Number(existingTxns) : 0) + 1}`
+    //     );
+    //     sendTransaction(event.data.data.txn).then(({ hash }) => {
+    //       localStorage.setItem(`${txnKey}[hash]`, hash);
+    //     });
+    //     return;
+    //   }
+    //   if (compiled) {
+    //     return;
+    //   }
+    //   if (type === 'zkapp' && action === 'compiled') {
+    //     setCompiled(true);
+    //   } else if (type === 'update') {
+    //     toast.loading(event.data.data, { id: 'zkapp-loader-toast' });
+    //   }
+    // };
   }, []);
 
   useEffect(() => {

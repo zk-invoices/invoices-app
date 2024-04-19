@@ -1,6 +1,6 @@
 import NiceModal from '@ebay/nice-modal-react';
 import { initializeApp } from 'firebase/app';
-import { Toaster } from 'react-hot-toast';
+import toast, { Toaster } from 'react-hot-toast';
 
 import { UserProvider } from './context/UserContext';
 import Router from './Router';
@@ -10,6 +10,9 @@ import InvoiceAccountModal from './components/InvoiceAccountModal';
 import TransactionsDrawer from './components/TransactionsDrawer';
 import CreateClientModal from './components/CreateClientModal';
 import CreateNewProductModal from './components/CreateNewProduct';
+
+import { getClient } from './invoicesProvicerWorkerClient';
+import { useEffect } from 'react';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FB_API_KEY,
@@ -29,7 +32,19 @@ NiceModal.register('transaction-drawer', TransactionsDrawer);
 NiceModal.register('add-new-client-modal', CreateClientModal);
 NiceModal.register('add-new-product-modal', CreateNewProductModal);
 
+const clientPromise = getClient((event) => {
+  const { type } = event.data || {};
+
+  if (type === 'update') {
+    toast.loading(event.data.data, { id: 'zkapp-loader-toast' });
+  }
+});
+
 export default function AppContainer() {
+  useEffect(() => {
+    clientPromise.then(console.log);
+  }, []);
+
   return (
     <UserProvider>
       <NiceModal.Provider>
