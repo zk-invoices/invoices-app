@@ -11,7 +11,8 @@ import TransactionsDrawer from './components/TransactionsDrawer';
 import CreateClientModal from './components/CreateClientModal';
 import CreateNewProductModal from './components/CreateNewProduct';
 
-import { getClient } from './invoicesProvicerWorkerClient';
+// import { getClient } from './invoicesProvicerWorkerClient';
+import { getClient } from './zkProgramWorkerClient';
 import { useEffect } from 'react';
 
 const firebaseConfig = {
@@ -42,7 +43,11 @@ const clientPromise = getClient((event) => {
 
 export default function AppContainer() {
   useEffect(() => {
-    clientPromise.then(console.log);
+    clientPromise.then(() => {
+      toast.success('Program compiled successfully', {
+        id: 'zkapp-loader-toast',
+      });
+    });
   }, []);
 
   return (
