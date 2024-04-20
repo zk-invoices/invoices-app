@@ -4,7 +4,7 @@ import {
   createBrowserRouter,
   createRoutesFromElements,
   Route,
-  RouterProvider
+  RouterProvider,
 } from 'react-router-dom';
 
 import Layout from './pages/Layout';
@@ -38,9 +38,9 @@ const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/">
       <Route path="/login" element={<Login />} />
-      <Route path="/_" element={<NewLayout />}>
+      <Route path="/" element={<NewLayout />}>
         <Route
-          path="/_"
+          path="/"
           element={
             <ProtectedRoute>
               <HomePage />
@@ -48,7 +48,7 @@ const router = createBrowserRouter(
           }
         />
         <Route
-          path="/_/invoices/new"
+          path="/invoices/new"
           element={
             <ProtectedRoute>
               <NewSendInvoice />
@@ -56,7 +56,7 @@ const router = createBrowserRouter(
           }
         />
         <Route
-          path="/_/clients"
+          path="/clients"
           element={
             <ProtectedRoute>
               <ClientsPage />
@@ -64,7 +64,7 @@ const router = createBrowserRouter(
           }
         />
         <Route
-          path="/_/products"
+          path="/products"
           element={
             <ProtectedRoute>
               <ProductsPage />
@@ -72,9 +72,9 @@ const router = createBrowserRouter(
           }
         />
       </Route>
-      <Route path="/" element={<Layout />}>
+      <Route path="/_" element={<Layout />}>
         <Route
-          path="/"
+          path="/_"
           element={
             <ProtectedRoute>
               <Invoices />
@@ -82,7 +82,7 @@ const router = createBrowserRouter(
           }
         />
         <Route
-          path="/products"
+          path="/_/products"
           element={
             <ProtectedRoute>
               <Products />
@@ -90,14 +90,13 @@ const router = createBrowserRouter(
           }
         />
         <Route
-          path="/invoices/new"
+          path="/_/invoices/new"
           element={
             <ProtectedRoute>
               <SendInvoice />
             </ProtectedRoute>
           }
         />
-        <Route path="/login" element={<Login />} />
       </Route>
     </Route>
   )

@@ -25,7 +25,9 @@ const getAPI = async () => {
     }
   );
 
-  postStatusUpdate({ message: 'Initiated zkApp compilation process' });
+  postStatusUpdate({
+    message: 'Initiated Invoices Program compilation process',
+  });
 
   await programCache.fetch();
   await InvoicesProgram.compile({ cache: programCache.cache() });

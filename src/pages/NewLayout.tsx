@@ -99,7 +99,7 @@ function Sidebar() {
           <nav className="grid items-start px-4 space-y-2 text-sm font-medium">
             <Link
               className="flex items-center gap-3 rounded-lg px-3 py-2 bg-gray-900 text-white transition-all hover:bg-gray-100 hover:text-gray-900"
-              to="/invoices/new"
+              to="/_/invoices/new"
             >
               <PlusIcon className="h-4 w-4" />
               New Invoice
